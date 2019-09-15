@@ -236,7 +236,6 @@ module.exports = {
         '"Noto Color Emoji"',
       ],
       serif: [
-        'Muli',
         'Georgia',
         'Cambria',
         '"Times New Roman"',
@@ -244,7 +243,6 @@ module.exports = {
         'serif',
       ],
       mono: [
-        'Muli',
         'Menlo',
         'Monaco',
         'Consolas',
