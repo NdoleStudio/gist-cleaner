@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './style.scss';
 import {GITHUB_AUTH_URL} from "../../constants/constants";
 import logo from '../../images/github-logo.png';
 
-const LandingPage = (props) =>
-  <div className="app w-full h-full flex">
+const LandingPage = () =>
+  <div className="app w-full h-screen flex">
     <div className="md:w-1/3 flex items-center">
       <div className="px-2">
         <h2 className="w-full text-center text-3xl">
@@ -19,7 +19,6 @@ const LandingPage = (props) =>
       </div>
     </div>
     <div className="md:w-2/3 bg-green-700">
-
     </div>
   </div>;
 
