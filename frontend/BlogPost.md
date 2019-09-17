@@ -19,3 +19,6 @@
 - directory structure.
 - checkbox helper
 - dark mode
+- creating yarn deploy
+- custom build script
+- naming of constants. should start with ROUTE

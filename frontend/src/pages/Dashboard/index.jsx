@@ -57,9 +57,18 @@ class Dashboard extends Component {
               <div className="w-11/12">
                 <div className="bg-gray-300 rounded text-black p-3 border-2 border-gray-400 flex">
                   <div className="w-11/12">
-                    <h2 className="font-bold">{data.file_name}</h2>
-                    <h5 className="text-xs">{data.created_at}</h5>
-                    <h4 className="text-sm"> {data.description}</h4>
+                    <div className="header flex">
+                      <div className="w-1/12">
+                        <span className="mr-1 bg-white text-red-600 px-1"><i className="mdi mdi-code-tags"></i></span>
+                      </div>
+                      <div className="w-11/12">
+                        <h2 className="font-bold">
+                          {data.file_name}
+                        </h2>
+                        <h5 className="text-xs">{data.created_at}</h5>
+                        <h4 className="text-sm"> {data.description}</h4>
+                      </div>
+                    </div>
                     <div className="w-full">
                       <div id="tempElement" />
                     </div>
