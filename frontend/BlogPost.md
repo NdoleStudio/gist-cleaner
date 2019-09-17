@@ -1,0 +1,21 @@
+## Introduction
+
+- Explain Directory Structure
+
+## Thanks to 
+
+- material design icons
+- svg page
+- github badge url
+
+## Process 
+
+### Frontend  interesting things to mention
+
+- Routing with React.js 
+- 404 route
+- 404 route on firebase doesn't work
+- how to embed javascript in elemment react.js
+- directory structure.
+- checkbox helper
+- dark mode

@@ -1,4 +1,5 @@
 import React from 'react';
+import 'pretty-checkbox';
 import './style.scss';
 import {GITHUB_AUTH_URL} from "../../constants/constants";
 import logo from '../../images/github-logo.png';
