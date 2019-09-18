@@ -50,33 +50,28 @@ class Dashboard extends Component {
                 Delete Selected Gists
               </a>
             </div>
-            <div className="w-full flex ">
+            <div className="w-full flex">
               <div className="w-1/12 pl-4">
                 <CheckBox/>
               </div>
-              <div className="w-11/12">
-                <div className="bg-gray-300 rounded text-black p-3 border-2 border-gray-400 flex">
+
+              <div className="w-11/12 header">
+                <div className="w-full flex bg-gray-300 rounded text-black px-3 border-2 rounded-b-none border-gray-400">
                   <div className="w-11/12">
-                    <div className="header flex">
-                      <div className="w-1/12">
-                        <span className="mr-1 bg-white text-red-600 px-1"><i className="mdi mdi-code-tags"></i></span>
-                      </div>
-                      <div className="w-11/12">
-                        <h2 className="font-bold">
-                          {data.file_name}
-                        </h2>
-                        <h5 className="text-xs">{data.created_at}</h5>
-                        <h4 className="text-sm"> {data.description}</h4>
-                      </div>
-                    </div>
-                    <div className="w-full">
-                      <div id="tempElement" />
-                    </div>
+                    <h2 className="font-bold">
+                      {data.file_name}
+                    </h2>
+                    <h5 className="text-xs">{data.created_at}</h5>
+                    <h4 className="text-sm"> {data.description}</h4>
                   </div>
-                  <div className="w-1/12 border border-blue-100">
+                  <div className="w-1/12 border border-blue-200">
                   </div>
                 </div>
+                <div className="w-full border-b border-gray-300">
+                  <div id="tempElement"></div>
+                </div>
               </div>
+
             </div>
           </div>
         </section>

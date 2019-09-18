@@ -8,3 +8,14 @@
   height: calc(100vh - 61px);
 }
 
+.gist {
+  .gist-file{
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-top: none !important;
+  }
+
+  .gist-data{
+    max-height: 200px;
+  }
+}
