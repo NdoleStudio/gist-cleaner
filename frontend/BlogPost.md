@@ -15,7 +15,7 @@
 - Routing with React.js 
 - 404 route
 - 404 route on firebase doesn't work
-- how to embed javascript in elemment react.js
+- how to embed javascript in element react.js
 - directory structure.
 - checkbox helper
 - dark mode
