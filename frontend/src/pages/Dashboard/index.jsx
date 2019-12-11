@@ -7,11 +7,26 @@ import iconDelete from '../../images/icon-delete.png';
 import {GITHUB_AUTH_URL, ROUTE_LANDING_PAGE} from "../../constants/constants";
 import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
+import {API_RESPONSE} from "../../services/api";
+import moment from "moment";
 
 class Dashboard extends Component {
   componentDidMount() {
-    postscribe('#tempElement', '<script src="https://gist.github.com/AchoArnold/a99b9b3f73fe3d07d08d0fb45f994b50.js"></script>');
+    API_RESPONSE.map(function(gist) {
+      postscribe('#' + gist.id, '<script src="https://gist.github.com/AchoArnold/' + gist.id + '.js"></script>');
+    });
   }
+
+  getFileName(gist) {
+    for (let file in gist.files) {
+        return file;
+    }
+  }
+
+  renderDate(dateAsString) {
+    return moment.duration(moment().diff(moment(dateAsString))).humanize() + ' ago';
+  }
+
   render() {
     const data = {
       name: 'Acho Arnold',
@@ -19,8 +34,12 @@ class Dashboard extends Component {
       username: 'AchoArnold',
       file_name: 'UnsetterHelper.php',
       created_at: 'Created 3 months ago',
-      description: 'Create a function unsetter() which unsets properties on nested objects.'
+      description: 'Create a function unsetter() which unsets properties on nested objects.',
+      gists: API_RESPONSE
     };
+
+
+    let checkedCheckboxes = [];
 
     return (
       <div>
@@ -44,35 +63,44 @@ class Dashboard extends Component {
             </div>
           </div>
           <div className="md:w-3/4 bg-green-100 pt-6 px-3">
-            <div className="w-full text-right mb-3">
-              <a className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center" href={GITHUB_AUTH_URL}>
-                <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
-                Delete Selected Gists
-              </a>
-            </div>
-            <div className="w-full flex">
-              <div className="w-1/12 pl-4">
+            <div className="w-full flex items-center">
+              <div className="w-4/12 pl-4">
                 <CheckBox/>
+                <span className="ml-2">Select All</span>
               </div>
-
-              <div className="w-11/12 header">
-                <div className="w-full flex bg-gray-300 rounded text-black px-3 border-2 rounded-b-none border-gray-400">
-                  <div className="w-11/12">
-                    <h2 className="font-bold">
-                      {data.file_name}
-                    </h2>
-                    <h5 className="text-xs">{data.created_at}</h5>
-                    <h4 className="text-sm"> {data.description}</h4>
-                  </div>
-                  <div className="w-1/12 border border-blue-200">
-                  </div>
-                </div>
-                <div className="w-full border-b border-gray-300">
-                  <div id="tempElement"></div>
-                </div>
+              <div className="w-8/12 text-right mb-3">
+                <a className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center" href={GITHUB_AUTH_URL}>
+                  <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
+                  Delete Selected Gists
+                </a>
               </div>
-
             </div>
+            { data.gists.map((gist, key) => {
+              return (
+                <div className="w-full flex mb-3" key={gist.id}>
+                  <div className="w-1/12 pl-4">
+                    <CheckBox isChecked={checkedCheckboxes.includes(gist.id)}/>
+                  </div>
+                  <div className="w-11/12 header">
+                    <div className="w-full flex bg-gray-300 rounded text-black px-3 border-2 rounded-b-none border-gray-400">
+                      <div className="w-11/12">
+                        <h2 className="font-bold">
+                          {this.getFileName(gist)}
+                        </h2>
+                        <h5 className="text-xs">created {this.renderDate(gist.created_at)}</h5>
+                        <h4 className="text-sm">{gist.description}</h4>
+                      </div>
+                      <div className="w-1/12 border border-blue-200">
+                      </div>
+                    </div>
+                    <div className="w-full border-b border-gray-300">
+                      <div id={gist.id}></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
           </div>
         </section>
       </div>
