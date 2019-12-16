@@ -33,7 +33,7 @@ class Dashboard extends Component {
       gists: API_RESPONSE,
     }, () => {
       this.state.gists.map((gist) => {
-        return postscribe('#' + gist.id, '<script src="https://gist.github.com/AchoArnold/' + gist.id + '.js"></script>');
+        // return postscribe('#' + gist.id, '<script src="https://gist.github.com/AchoArnold/' + gist.id + '.js"></script>');
       });
     });
   }
@@ -123,7 +123,7 @@ class Dashboard extends Component {
                 <span className="ml-2">Select All</span>
               </div>
               <div className="w-8/12 text-right mb-3">
-                <a onClick={this.openDisplayModal} className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center" href={GITHUB_AUTH_URL}>
+                <a disabled onClick={this.openDisplayModal} className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center" href={GITHUB_AUTH_URL}>
                   <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
                   Delete Selected Gists
                 </a>
@@ -163,8 +163,18 @@ class Dashboard extends Component {
               <button className="modal-close-btn" onClick={this.closeDisplayModal}>
                 <img src={closeIcon}/>
               </button>
-              <div className="text">
-                <p>How are you doing today</p>
+              <div className="text-center text">
+                <p>
+                  Are you sure you want to delete <span className="font-bold">{ this.state.checkedGists.length }</span> selected { this.state.checkedGists.length === 1 ? 'gist' : 'gists' }?
+                </p>
+                <p>Enter your github username below to confirm.</p>
+                <input className="text-center w-2/3 mt-3 mb-3" placeholder="e.g GithubUsername" type="text"/>
+                <div className="w-full">
+                  <a className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center">
+                    <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
+                    Delete Selected Gists
+                  </a>
+                </div>
               </div>
             </div>
           </div>
