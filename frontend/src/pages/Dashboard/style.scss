@@ -19,3 +19,88 @@
     max-height: 200px;
   }
 }
+
+
+/**
+ * Modal Content
+ */
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 40vh; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.75); /* Black w/ opacity */
+  animation-name: animate-show;
+  animation-duration: 0.4s;
+
+
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    border: 1px solid grey;
+    border-radius: 4.5px;
+    width: 288px;
+
+    h2 {
+      margin-top: 0;
+      line-height: 0.9em;
+      margin-bottom: 5px;
+      font-family: "National2Condensed-Bold", monospace;
+      font-size: 40px;
+    }
+
+    div.w-full {
+      position:relative;
+
+      .text {
+        padding: 20px;
+      }
+    }
+
+    .modal-close-btn {
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: none;
+      position: absolute;
+      cursor: pointer;
+      outline: none;
+      display: block;
+      right: 0;
+
+      img {
+        height: 24px;
+        width: 24px;
+      }
+
+      &:hover,
+      &:focus,
+      &:active {
+        outline: none;
+        border: none;
+      }
+    }
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
