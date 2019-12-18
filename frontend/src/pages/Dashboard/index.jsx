@@ -159,7 +159,7 @@ class Dashboard extends Component {
                         <h5 className="text-xs">created {this.renderDate(gist.created_at)}</h5>
                         <h4 className="text-sm">{gist.description}</h4>
                       </div>
-                      <div className="w-1/12 border border-blue-200">
+                      <div className="w-1/12">
                       </div>
                     </div>
                     <div className="w-full border-b border-gray-300">
