@@ -5,7 +5,7 @@ import '@mdi/font/css/materialdesignicons.min.css';
 import logo from '../../images/logo.png'
 import iconDelete from '../../images/icon-delete.png';
 import closeIcon from '../../images/close-icon.svg';
-import {GITHUB_AUTH_URL, ROUTE_LANDING_PAGE} from "../../constants/constants";
+import {ROUTE_LANDING_PAGE, BASE_INPUT_CLASS, BASE_BUTTON_CLASS} from "../../constants/constants";
 import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
 import {API_RESPONSE} from "../../services/api";
@@ -22,10 +22,12 @@ class Dashboard extends Component {
       image_url: 'https://avatars3.githubusercontent.com/u/4196457?v=4',
       username: 'AchoArnold',
       displayModal: false,
+      usernameInput: '',
     };
 
     this.openDisplayModal = this.openDisplayModal.bind(this);
     this.closeDisplayModal = this.closeDisplayModal.bind(this);
+    this.handleUsernameInputChange = this.handleUsernameInputChange.bind(this);
   }
 
   componentDidMount() {
@@ -38,11 +40,18 @@ class Dashboard extends Component {
     });
   }
 
+  handleUsernameInputChange(event) {
+    this.setState({
+      usernameInput: event.target.value
+    });
+  }
+
   closeDisplayModal(event) {
     event.preventDefault();
 
     this.setState({
-      displayModal: false
+      displayModal: false,
+      usernameInput: ''
     });
   }
 
@@ -54,10 +63,12 @@ class Dashboard extends Component {
     });
   }
 
+  hasCheckedGists() {
+    return this.state.checkedGists.length > 0;
+  }
+
   getFileName(gist) {
-    for (let file in gist.files) {
-        return file;
-    }
+    return Object.keys(gist.files)[0];
   }
 
   toggleCheckBox(gistId) {
@@ -88,6 +99,10 @@ class Dashboard extends Component {
 
   selectAllIsChecked() {
     return this.state.checkedGists.length === this.state.gists.length;
+  }
+
+  usernameInputIsEqualToUsername() {
+    return this.state.usernameInput === this.state.username;
   }
 
   renderDate(dateAsString) {
@@ -123,10 +138,10 @@ class Dashboard extends Component {
                 <span className="ml-2">Select All</span>
               </div>
               <div className="w-8/12 text-right mb-3">
-                <a disabled onClick={this.openDisplayModal} className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center" href={GITHUB_AUTH_URL}>
+                <button disabled={!this.hasCheckedGists()} onClick={this.openDisplayModal} className={`${BASE_BUTTON_CLASS} ${ this.hasCheckedGists() ? '' :'opacity-50 cursor-not-allowed'}`}>
                   <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
                   Delete Selected Gists
-                </a>
+                </button>
               </div>
             </div>
             { this.state.gists.map((gist, key) => {
@@ -168,12 +183,12 @@ class Dashboard extends Component {
                   Are you sure you want to delete <span className="font-bold">{ this.state.checkedGists.length }</span> selected { this.state.checkedGists.length === 1 ? 'gist' : 'gists' }?
                 </p>
                 <p>Enter your github username below to confirm.</p>
-                <input className="text-center w-2/3 mt-3 mb-3" placeholder="e.g GithubUsername" type="text"/>
+                <input onInput={this.handleUsernameInputChange} className={`${BASE_INPUT_CLASS} ${this.usernameInputIsEqualToUsername() ? 'border-green-500' : 'border-red-500'}`} placeholder="e.g GithubUsername" type="text"/>
                 <div className="w-full">
-                  <a className="auth-btn bg-transparent hover:bg-red-500 text-red-700 hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded inline-flex items-center">
+                  <button disabled={!this.usernameInputIsEqualToUsername()} className={`${BASE_BUTTON_CLASS} ${this.usernameInputIsEqualToUsername() ? '': 'opacity-50 cursor-not-allowed'}`}>
                     <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
                     Delete Selected Gists
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
