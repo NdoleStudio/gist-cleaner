@@ -5,7 +5,7 @@
 }
 
 .body-content{
-  height: calc(100vh - 61px);
+  min-height: 100vh;
 }
 
 .gist {
