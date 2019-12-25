@@ -25,6 +25,7 @@ class Dashboard extends Component {
       username: 'AchoArnold',
       displayModal: false,
       usernameInput: '',
+      token: null
     };
 
     this.openDisplayModal = this.openDisplayModal.bind(this);
@@ -197,7 +198,7 @@ class Dashboard extends Component {
           <div className="modal-content text-center">
             <div className="w-full">
               <button className="modal-close-btn" onClick={this.closeDisplayModal}>
-                <img src={closeIcon}/>
+                <img src={closeIcon} alt="Close icon"/>
               </button>
               <div className="text-center text">
                 <p>
