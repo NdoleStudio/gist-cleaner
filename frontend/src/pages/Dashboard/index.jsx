@@ -10,6 +10,8 @@ import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
 import {API_RESPONSE} from "../../services/api";
 import moment from "moment";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -28,6 +30,11 @@ class Dashboard extends Component {
     this.openDisplayModal = this.openDisplayModal.bind(this);
     this.closeDisplayModal = this.closeDisplayModal.bind(this);
     this.handleUsernameInputChange = this.handleUsernameInputChange.bind(this);
+    this.deleteButtonClicked = this.deleteButtonClicked.bind(this);
+
+    toast.configure({
+      autoClose: 8000,
+    });
   }
 
   componentDidMount() {
@@ -69,6 +76,20 @@ class Dashboard extends Component {
 
   getFileName(gist) {
     return Object.keys(gist.files)[0];
+  }
+
+  deleteButtonClicked(event) {
+    event.preventDefault();
+
+    this.closeDisplayModal(event);
+
+    this.setState({
+      checkedGists: [],
+      gists: this.state.gists.filter(gist => !this.state.checkedGists.includes(gist.id)),
+      usernameInput: ''
+    });
+
+    toast.info(() => <p>Your gists are now being deleted.<br/>You'll get a notification when it's done!</p>);
   }
 
   toggleCheckBox(gistId) {
@@ -144,7 +165,7 @@ class Dashboard extends Component {
                 </button>
               </div>
             </div>
-            { this.state.gists.map((gist, key) => {
+            { this.state.gists.map((gist) => {
               return (
                 <div className="w-full flex mb-3" key={gist.id}>
                   <div className="w-1/12 pl-4">
@@ -183,9 +204,9 @@ class Dashboard extends Component {
                   Are you sure you want to delete <span className="font-bold">{ this.state.checkedGists.length }</span> selected { this.state.checkedGists.length === 1 ? 'gist' : 'gists' }?
                 </p>
                 <p>Enter your github username below to confirm.</p>
-                <input onInput={this.handleUsernameInputChange} className={`${BASE_INPUT_CLASS} ${this.usernameInputIsEqualToUsername() ? 'border-green-500' : 'border-red-500'}`} placeholder="e.g GithubUsername" type="text"/>
+                <input onInput={this.handleUsernameInputChange} value={this.state.usernameInput} className={`${BASE_INPUT_CLASS} ${this.usernameInputIsEqualToUsername() ? 'border-green-500' : 'border-red-500'}`} placeholder="e.g GithubUsername" type="text"/>
                 <div className="w-full">
-                  <button disabled={!this.usernameInputIsEqualToUsername()} className={`${BASE_BUTTON_CLASS} ${this.usernameInputIsEqualToUsername() ? '': 'opacity-50 cursor-not-allowed'}`}>
+                  <button onClick={this.deleteButtonClicked} disabled={!this.usernameInputIsEqualToUsername()} className={`${BASE_BUTTON_CLASS} ${this.usernameInputIsEqualToUsername() ? '': 'opacity-50 cursor-not-allowed'}`}>
                     <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
                     Delete Selected Gists
                   </button>
