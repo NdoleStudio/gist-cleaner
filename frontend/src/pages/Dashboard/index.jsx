@@ -205,7 +205,7 @@ class Dashboard extends Component {
                   Are you sure you want to delete <span className="font-bold">{ this.state.checkedGists.length }</span> selected { this.state.checkedGists.length === 1 ? 'gist' : 'gists' }?
                 </p>
                 <p>Enter your github username below to confirm.</p>
-                <input onInput={this.handleUsernameInputChange} value={this.state.usernameInput} className={`${BASE_INPUT_CLASS} ${this.usernameInputIsEqualToUsername() ? 'border-green-500' : 'border-red-500'}`} placeholder="e.g GithubUsername" type="text"/>
+                <input onInput={this.handleUsernameInputChange} onChange={this.handleUsernameInputChange} value={this.state.usernameInput} className={`${BASE_INPUT_CLASS} ${this.usernameInputIsEqualToUsername() ? 'border-green-500' : 'border-red-500'}`} placeholder="e.g GithubUsername" type="text"/>
                 <div className="w-full">
                   <button onClick={this.deleteButtonClicked} disabled={!this.usernameInputIsEqualToUsername()} className={`${BASE_BUTTON_CLASS} ${this.usernameInputIsEqualToUsername() ? '': 'opacity-50 cursor-not-allowed'}`}>
                     <img src={iconDelete} alt="Delete Icon" className="mr-1"/>
