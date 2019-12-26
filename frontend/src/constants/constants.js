@@ -12,3 +12,14 @@ export const BASE_BUTTON_CLASS = 'auth-btn bg-transparent hover:bg-red-500 text-
 export const API_ENDPOINT_DASHBOARD = 'http://localhost:8080/v1/dashboard';
 
 export const API_ENDPOINT_DELETE = 'http://localhost:8080/v1/delete';
+
+export const PUSHER_APP_KEY = '35a8c7a2a9c1b3685ea7';
+
+export const PUSHER_CLUSTER = 'eu';
+
+export const EVENT_GIST_DELETED = 'gist-deleted';
+
+export const EVENT_ALL_GISTS_DELETED = 'all-gists-deleted';
+
+export const KEY_ACCESS_TOKEN = "accessToken";
+export const KEY_ACCESS_CODE = "code";
