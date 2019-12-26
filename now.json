@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "name": "go",
+  "public": true,
+  "builds": [{ "src": "backend/**/*.go", "use": "@now/go" }],
+  "routes": [
+    { "src": "/", "dest": "backend/hello.go" },
+    { "src": "/(.*)", "dest": "cmd/$1.go" }
+  ]
