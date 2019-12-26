@@ -10,3 +10,5 @@ export const BASE_BUTTON_CLASS = 'auth-btn bg-transparent hover:bg-red-500 text-
 
 
 export const API_ENDPOINT_DASHBOARD = 'http://localhost:8080/v1/dashboard';
+
+export const API_ENDPOINT_DELETE = 'http://localhost:8080/v1/delete';

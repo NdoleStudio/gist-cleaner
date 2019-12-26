@@ -5,7 +5,7 @@ import '@mdi/font/css/materialdesignicons.min.css';
 import logo from '../../images/logo.png'
 import iconDelete from '../../images/icon-delete.png';
 import closeIcon from '../../images/close-icon.svg';
-import {ROUTE_LANDING_PAGE, BASE_INPUT_CLASS, BASE_BUTTON_CLASS, API_ENDPOINT_DASHBOARD} from "../../constants/constants";
+import {ROUTE_LANDING_PAGE, BASE_INPUT_CLASS, BASE_BUTTON_CLASS, API_ENDPOINT_DASHBOARD, API_ENDPOINT_DELETE} from "../../constants/constants";
 import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
 import {API_RESPONSE} from "../../services/api";
@@ -45,45 +45,45 @@ class Dashboard extends Component {
   componentDidMount() {
     console.log(window.location.search);
     console.log(new URLSearchParams(window.location.search).get('code'));
-
-    this.setState({
-      gists: API_RESPONSE.gists,
-      name: API_RESPONSE.name,
-      url: API_RESPONSE.url,
-      bio: API_RESPONSE.bio,
-      username: API_RESPONSE.username,
-      avatar_url: API_RESPONSE.avatar_url,
-      access_token: API_RESPONSE.access_token,
-    }, () => {
-      this.state.gists.map((gist) => {
-        return postscribe('#' + gist.id, '<script src="https://gist.github.com/' + this.state.username + '/' + gist.name + '.js"></script>');
-      });
-    });
-    // fetch(API_ENDPOINT_DASHBOARD, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     code: new URLSearchParams(window.location.search).get('code')
-    //   })
-    // }).then(response => response.json()).then(data => {
-    //   console.log(data);
-    //   this.setState({
-    //     gists: data.gists,
-    //     name: data.name,
-    //     url: data.url,
-    //     bio: data.bio,
-    //     username: data.username,
-    //     avatar_url: data.avatar_url,
-    //     access_token: data.access_token,
-    //   }, () => {
-    //     this.state.gists.map((gist) => {
-    //       // return postscribe('#' + gist.id, '<script src="https://gist.github.com/AchoArnold/' + gist.id + '.js"></script>');
-    //     });
+    //
+    // this.setState({
+    //   gists: API_RESPONSE.gists,
+    //   name: API_RESPONSE.name,
+    //   url: API_RESPONSE.url,
+    //   bio: API_RESPONSE.bio,
+    //   username: API_RESPONSE.username,
+    //   avatar_url: API_RESPONSE.avatar_url,
+    //   access_token: API_RESPONSE.access_token,
+    // }, () => {
+    //   this.state.gists.map((gist) => {
+    //     return postscribe('#' + gist.id, '<script src="https://gist.github.com/' + this.state.username + '/' + gist.name + '.js"></script>');
     //   });
     // });
+    fetch(API_ENDPOINT_DASHBOARD, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        code: new URLSearchParams(window.location.search).get('code')
+      })
+    }).then(response => response.json()).then(data => {
+      console.log(data);
+      this.setState({
+        gists: data.gists,
+        name: data.name,
+        url: data.url,
+        bio: data.bio,
+        username: data.username,
+        avatar_url: data.avatar_url,
+        access_token: data.access_token,
+      }, () => {
+        this.state.gists.map((gist) => {
+          return postscribe('#' + gist.id, '<script src="https://gist.github.com/' + this.state.username + '/' + gist.name + '.js"></script>');
+        });
+      });
+    });
   }
 
   handleUsernameInputChange(event) {
@@ -113,18 +113,28 @@ class Dashboard extends Component {
     return this.state.checkedGists.length > 0;
   }
 
-  getFileName(gist) {
-    return Object.keys(gist.files)[0];
-  }
-
   deleteButtonClicked(event) {
     event.preventDefault();
 
     this.closeDisplayModal(event);
 
+    fetch(API_ENDPOINT_DELETE, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        access_token: this.state.access_token,
+        ids: this.state.checkedGists
+      })
+    }).then(response => response.json()).then(data => {
+      console.log(data);
+    });
+
     this.setState({
       checkedGists: [],
-      gists: this.state.gists.filter(gist => !this.state.checkedGists.includes(gist.id)),
+      gists: this.state.gists.filter(gist => !this.state.checkedGists.includes(gist.name)),
       usernameInput: ''
     });
 
@@ -217,7 +227,7 @@ class Dashboard extends Component {
                   return (
                     <div className="w-full flex mb-3" key={gist.id}>
                       <div className="w-1/12 pl-4">
-                        <CheckBox isChecked={this.state.checkedGists.includes(gist.id)} onChange={() => this.toggleCheckBox(gist.id)} />
+                        <CheckBox isChecked={this.state.checkedGists.includes(gist.name)} onChange={() => this.toggleCheckBox(gist.name)} />
                       </div>
                       <div className="w-11/12 header">
                         <div className="w-full flex bg-gray-300 rounded text-black px-3 border-2 rounded-b-none border-gray-400">

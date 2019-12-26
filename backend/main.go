@@ -26,6 +26,13 @@ type DashboardRequest struct {
 	Code string `json:"code"`
 }
 
+
+type DeleteRequest struct {
+	AccessToken string `json:"access_token"`
+	Ids []string `json:"ids"`
+}
+
+
 type DashboardData struct {
 	Data struct {
 		Viewer struct {
@@ -56,6 +63,7 @@ type hashMap map[string]string
 
 
 func handleRoot(responseWriter http.ResponseWriter, request *http.Request) {
+	log.Println("Delete Options")
 	responseObject := map[string]interface{}{
 		"apiVersion": API_VERSION,
 	}
@@ -66,6 +74,43 @@ func handleRoot(responseWriter http.ResponseWriter, request *http.Request) {
 //func notFound(responseWriter http.ResponseWriter, r *http.Request) {
 //	writeResponseObject(responseWriter, map[string]interface{}{"how": "fine"})
 //}
+
+func handleDelete(responseWriter http.ResponseWriter, request *http.Request) {
+	decoder := json.NewDecoder(request.Body)
+	var deleteRequest DeleteRequest
+	err := decoder.Decode(&deleteRequest)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(deleteRequest.Ids)
+	log.Println(deleteRequest.AccessToken)
+
+	var deletedIds []string
+	for index := range deleteRequest.Ids {
+		gistId :=deleteRequest.Ids[index]
+
+		deleteUrl := os.Getenv("GITHUB_REST_API_ENDPOINT") + "/gists/" + gistId
+
+
+		log.Println(deleteUrl)
+
+		apiRequest := createDeleteRequest(deleteUrl, deleteRequest.AccessToken)
+
+		client := &http.Client{}
+		apiResponse, _ := client.Do(apiRequest)
+
+		log.Println(apiResponse.Status)
+
+		if apiResponse.StatusCode == http.StatusNoContent {
+			deletedIds = append(deletedIds, gistId)
+		}
+	}
+
+	writeResponseObject(responseWriter, map[string]interface{}{
+		"deletedIds": deletedIds,
+	})
+}
 
 func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
@@ -126,8 +171,8 @@ func getGistsFromEdges(apiResponseData DashboardData) []hashMap {
 	gists := make([]hashMap, 0)
 	gistData :=apiResponseData.Data.Viewer.Gists.Edges
 
-	for k := range gistData {
-		nodeData := gistData[k].Node;
+	for index := range gistData {
+		nodeData := gistData[index].Node;
 		gists = append(gists, map[string]string {
 			"id": nodeData.ID,
 			"file_name": nodeData.Files[0].Name,
@@ -139,6 +184,18 @@ func getGistsFromEdges(apiResponseData DashboardData) []hashMap {
 	}
 
 	return gists
+}
+
+func createDeleteRequest(url string, token string) *http.Request {
+	apiRequest, err := http.NewRequest("DELETE", url, bytes.NewBuffer([]byte{}))
+	if err != nil {
+		log.Println("Cannot create request")
+	}
+	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
+	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
+	apiRequest.Header.Set("Authorization", "token " + token)
+
+	return apiRequest
 }
 
 func createPostRequest(url string, requestParams map[string]interface{}) *http.Request {
@@ -173,6 +230,7 @@ func jsonEncodeMap(mapObject map[string]interface{}) []byte {
 func writeResponseObject(responseWriter http.ResponseWriter, responseObject map[string] interface{}) {
 	responseWriter.Header().Set("Content-Type", JSON_CONTENT_TYPE)
 	responseWriter.Header().Set("Access-Control-Allow-Origin", "*")
+	responseWriter.Header().Set("Access-Control-Allow-Methods", "POST, DELETE")
 	responseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	responseWriter.WriteHeader(http.StatusOK)
@@ -201,6 +259,8 @@ func main() {
 	api.HandleFunc("/", handleRoot)
 	api.HandleFunc("/dashboard", handleDashboard).Methods(http.MethodPost)
 	api.HandleFunc("/dashboard", handleRoot).Methods(http.MethodOptions)
+	api.HandleFunc("/delete", handleDelete).Methods(http.MethodDelete)
+	api.HandleFunc("/delete", handleRoot).Methods(http.MethodOptions)
 
 	log.Println("Server started")
 	log.Fatalln(http.ListenAndServe(":8080", r))
