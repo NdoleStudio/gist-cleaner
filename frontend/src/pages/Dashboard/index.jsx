@@ -54,7 +54,7 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    this.loadDashboardData()
+    this.loadDashboardData();
   }
 
   loadDashboardData() {
@@ -86,7 +86,8 @@ class Dashboard extends Component {
       <p>
         <b>Error Performing Request</b>
         <br />
-        There was an error while performing your request. We've been notified about this already and it will be solved as soon as possible.
+        There was an error while performing your request. We've been notified
+        about this already and it will be solved as soon as possible.
       </p>
     ));
 
@@ -197,8 +198,8 @@ class Dashboard extends Component {
         }),
       }),
     }).catch(() => {
-      this.handleApiError()
-    })
+      this.handleApiError();
+    });
   }
 
   removeDeletedGistsFromState() {
@@ -227,7 +228,7 @@ class Dashboard extends Component {
 
     let channel = pusher.subscribe(this.state.id);
 
-    channel.bind(EVENT_GIST_DELETED, function(data) {
+    channel.bind(EVENT_GIST_DELETED, data => {
       toast.info(() => (
         <p>
           <b>{data.file_name}</b> has been deleted successfully!
@@ -235,8 +236,9 @@ class Dashboard extends Component {
       ));
     });
 
-    channel.bind(EVENT_ALL_GISTS_DELETED, function(data) {
+    channel.bind(EVENT_ALL_GISTS_DELETED, data => {
       toast.success(() => <p>All the gists have been deleted successfully!</p>);
+      pusher.disconnect();
     });
   }
 
