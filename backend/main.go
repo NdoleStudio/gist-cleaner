@@ -16,13 +16,18 @@ import (
 )
 
 const API_VERSION = "v1"
+
 const JSON_CONTENT_TYPE = "application/json"
+
 const DASHBOARD_DATA_QUERY = "{\"query\": \"query {viewer{login id bio avatarUrl url name gists(first:50,privacy:ALL,orderBy:{field:CREATED_AT,direction:DESC}){edges{node{id files{name} description url updatedAt name isPublic}}}}}\"}"
+
 const EVENT_GIST_DELETED = "gist-deleted"
 const EVENT_ALL_GISTS_DELETED = "all-gists-deleted"
 
 const PATH_DASHBOARD = "/dashboard"
 const PATH_DELETE = "/delete"
+
+const GIST_PROFILE_BASE_PATH = "https://gist.github.com/"
 
 type accessTokenResponse struct {
 	AccessToken      string `json:"access_token"`
@@ -182,7 +187,7 @@ func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) 
 		"avatar_url":    apiResponseData.Data.Viewer.AvatarURL,
 		"name":          apiResponseData.Data.Viewer.Name,
 		"bio":           apiResponseData.Data.Viewer.Bio,
-		"url":           apiResponseData.Data.Viewer.URL,
+		"url":           GIST_PROFILE_BASE_PATH + apiResponseData.Data.Viewer.Login,
 		"gists":         getGistsFromEdges(apiResponseData),
 	}
 
