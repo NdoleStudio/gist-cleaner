@@ -1,9 +1,25 @@
 {
   "version": 2,
-  "name": "go",
+  "name": "api.gist-cleaner.ndolestudio.com",
   "public": true,
-  "builds": [{ "src": "backend/**/*.go", "use": "@now/go" }],
-  "routes": [
-    { "src": "/", "dest": "backend/hello.go" },
-    { "src": "/(.*)", "dest": "cmd/$1.go" }
-  ]
+  "builds": [
+  	{ "src": "backend/**/*.go", "use": "@now/go" }
+  ],
+  "rewrites": [
+    { "source": "(.*)", "destination": "backend/main.go" }
+  ],
+  "env": {
+    "GITHUB_ACCESS_TOKEN_ENDPOINT":"@github_access_token_endpoint",
+	"GITHUB_CLIENT_ID":"@github_client_id",
+	"GITHUB_CLIENT_SECRET":"@github_client_secret",
+	"GITHUB_GRAPHQL_API":"@github_graphql_api",
+	"GITHUB_REST_API_ENDPOINT":"@github_rest_api_endpoint",
+
+	"PUSHER_APP_ID":"@pusher_app_id",
+	"PUSHER_APP_KEY":"@pusher_app_key",
+	"PUSHER_SECRET":"@pusher_secret",
+	"PUSHER_CLUSTER":"@pusher_cluster",
+
+	"SENTRY_DSN":"@sentry_dsn"
+  }
+}

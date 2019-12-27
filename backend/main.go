@@ -1,11 +1,8 @@
-package main
+package handler
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/bugsnag/bugsnag-go"
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/pusher/pusher-http-go"
 	"io"
 	"io/ioutil"
@@ -15,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"github.com/getsentry/sentry-go"
 )
 
 const API_VERSION = "v1"
@@ -23,10 +21,11 @@ const DASHBOARD_DATA_QUERY = "{\"query\": \"query {viewer{login id bio avatarUrl
 const EVENT_GIST_DELETED = "gist-deleted"
 const EVENT_ALL_GISTS_DELETED = "all-gists-deleted"
 
+const PATH_DASHBOARD = "/dashboard"
+const PATH_DELETE = "/delete"
+
 type accessTokenResponse struct {
 	AccessToken      string `json:"access_token"`
-	ErrorDescription string `json:"error_description"`
-	Error            string `json:"error"`
 }
 
 type DashboardRequest struct {
@@ -125,7 +124,7 @@ func doHttpRequest(request *http.Request) *http.Response {
 
 	apiResponse, err := client.Do(request)
 	if err != nil {
-		log.Panicln("Cannot Perform Request", err.Error(), request.URL.String())
+		logError(err, "Cannot Perform Request", request.URL.String())
 	}
 
 	return apiResponse
@@ -136,7 +135,7 @@ func decodeJson(variable interface{}, reader io.Reader) interface{} {
 	err := decoder.Decode(variable)
 	if err != nil {
 		contents, _ := ioutil.ReadAll(reader)
-		log.Panicln("Cannot Decode Object", err.Error(), string(contents))
+		logError(err, "Cannot Decode Object", string(contents))
 	}
 
 	return variable
@@ -145,7 +144,7 @@ func decodeJson(variable interface{}, reader io.Reader) interface{} {
 func sendPusherTrigger(pusherClient pusher.Client, channelName string, eventName string, data interface{}) {
 	err := pusherClient.Trigger(channelName, eventName, data)
 	if err != nil {
-		log.Panicln("Cannot send pusher trigger", err.Error())
+		logError(err, "Cannot send pusher trigger", err.Error())
 	}
 }
 
@@ -177,7 +176,6 @@ func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) 
 
 	dashboardDataObject := map[string]interface{}{
 		"access_token":  accessToken,
-		"error":         false,
 		"is_successful": apiResponseData.Data.Viewer.Id != "",
 		"id":            apiResponseData.Data.Viewer.Id,
 		"username":      apiResponseData.Data.Viewer.Login,
@@ -230,8 +228,9 @@ func getGistsFromEdges(apiResponseData DashboardData) []HashMap {
 func createDeleteRequest(url string, token string) *http.Request {
 	apiRequest, err := http.NewRequest("DELETE", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		log.Panicln("Cannot create request", err.Error(), url)
+		logError(err, "Cannot create request", url)
 	}
+
 	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
 	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
 	apiRequest.Header.Set("Authorization", "token "+token)
@@ -242,8 +241,9 @@ func createDeleteRequest(url string, token string) *http.Request {
 func createPostRequest(url string, requestParams map[string]interface{}) *http.Request {
 	apiRequest, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonEncodeMap(requestParams)))
 	if err != nil {
-		log.Panicln("Cannot create request", err.Error(), url)
+		logError(err, "Cannot create request", url)
 	}
+
 	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
 	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
 
@@ -252,9 +252,8 @@ func createPostRequest(url string, requestParams map[string]interface{}) *http.R
 
 func createGraphQlRequest(url string, query string, token string) *http.Request {
 	apiRequest, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(query)))
-
 	if err != nil {
-		log.Panicln("Cannot create request", err.Error(), url)
+		logError(err, "Cannot create request", url)
 	}
 
 	apiRequest.Header.Set("Authorization", "bearer "+token)
@@ -265,7 +264,11 @@ func createGraphQlRequest(url string, query string, token string) *http.Request 
 }
 
 func jsonEncodeMap(mapObject map[string]interface{}) []byte {
-	encodedObject, _ := json.Marshal(mapObject)
+	encodedObject, err := json.Marshal(mapObject)
+	if err != nil {
+		logError(err, "Cannot Encode JSON")
+	}
+
 	return encodedObject
 }
 
@@ -279,42 +282,38 @@ func writeResponseObject(responseWriter http.ResponseWriter, responseObject map[
 
 	responseObjectInBytes, err := json.Marshal(responseObject)
 	if err != nil {
-		log.Fatalln("Cannot convert object to string")
+		logError(err, "Cannot convert object to string")
 	}
 
 	_, err = responseWriter.Write(responseObjectInBytes)
 	if err != nil {
-		log.Fatalln("Cannot write response")
+		logError(err, "Cannot write response")
 	}
 }
 
-func loadEnvVariables() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalln("Error loading .env file", err.Error())
-	}
+func logError(err error, parameters ...interface{}){
+	sentry.CaptureException(err)
+	sentry.Flush(time.Second * 5)
+
+	log.Panicln(err.Error(), parameters)
 }
 
-func init()  {
-	loadEnvVariables()
-}
-
-func main() {
-	bugsnag.Configure(bugsnag.Configuration{
-		APIKey: os.Getenv("BUGSNAG_API_KEY"),
-		// The import paths for the Go packages containing your source files
-		ProjectPackages: []string{"main", os.Getenv("BUGSNAG_PROJECT_PACKAGES")},
+func init() {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: os.Getenv("SENTRY_DSN"),
 	})
 
-	log.Println("Server Started")
+	if err != nil {
+		log.Println("Failed to initialize sentry", err.Error())
+	}
+}
 
-	router := mux.NewRouter()
-
-	apiRouter := router.PathPrefix("/" + API_VERSION).Subrouter()
-	apiRouter.HandleFunc("/dashboard", handleDashboard).Methods(http.MethodPost)
-	apiRouter.HandleFunc("/delete", handleDelete).Methods(http.MethodDelete)
-
-	router.PathPrefix("/").HandlerFunc(handleCatchAll)
-
-	log.Fatalln(http.ListenAndServe(":8080", bugsnag.Handler(router)))
+func Handler(responseWriter http.ResponseWriter, request *http.Request) {
+	if request.URL.Path == PATH_DASHBOARD && request.Method == http.MethodPost {
+		handleDashboard(responseWriter, request)
+	} else if  request.URL.Path == PATH_DELETE && request.Method == http.MethodDelete {
+		handleDelete(responseWriter, request)
+	} else {
+		handleCatchAll(responseWriter, request)
+	}
 }
