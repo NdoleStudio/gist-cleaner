@@ -81,6 +81,18 @@ class Dashboard extends Component {
       });
   }
 
+  handleApiError() {
+    toast.error(() => (
+      <p>
+        <b>Error Performing Request</b>
+        <br />
+        There was an error while performing your request. We've been notified about this already and it will be solved as soon as possible.
+      </p>
+    ));
+
+    this.props.history.push(ROUTE_LANDING_PAGE);
+  }
+
   handleExpiredTokenData() {
     toast.error(() => (
       <p>
@@ -166,6 +178,8 @@ class Dashboard extends Component {
       </p>
     ));
 
+    this.removeDeletedGistsFromState();
+
     fetch(API_ENDPOINT_DELETE, {
       method: 'DELETE',
       headers: {
@@ -182,14 +196,18 @@ class Dashboard extends Component {
           };
         }),
       }),
-    }).then(() => {
-      this.setState({
-        checkedGists: [],
-        gists: this.state.gists.filter(
-          gist => !this.state.checkedGists.includes(gist.name)
-        ),
-        usernameInput: '',
-      });
+    }).catch(() => {
+      this.handleApiError()
+    })
+  }
+
+  removeDeletedGistsFromState() {
+    this.setState({
+      checkedGists: [],
+      gists: this.state.gists.filter(
+        gist => !this.state.checkedGists.includes(gist.name)
+      ),
+      usernameInput: '',
     });
   }
 
