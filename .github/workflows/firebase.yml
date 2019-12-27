@@ -33,6 +33,7 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: build
+          path: ./frontend/build
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
