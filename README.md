@@ -74,7 +74,7 @@ Routing is done by the `Handler` method in the `main.go` file. There's a rule in
 
 #### Hosting
 
-The backend is hosted for free on [Ziet (now.sh)](https://zeit.co) and it's handled completely using serverless functions. The [./.backend/now.json](./.backend/now.json) file provides the configuration needed for building and deploying the functions. A new deploy is made to production each time there's a push on the master branch.
+The backend is hosted for free on [Ziet (now.sh)](https://zeit.co) and it's handled completely using serverless functions. The [./backend/now.json](./backend/now.json) file provides the configuration needed for building and deploying the functions. A new deploy is made to production each time there's a push on the master branch.
 
 A point to note here is this line `{ "source": "(.*)", "destination": "backend/main.go" }` which enforces that all requests which are made to the app are sent to the `Handler` function in the `main.go` file. So this handler function acts as a router for performing the requests.
 
