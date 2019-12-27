@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/getsentry/sentry-go"
 	"github.com/pusher/pusher-http-go"
 	"io"
 	"io/ioutil"
@@ -12,7 +13,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-	"github.com/getsentry/sentry-go"
 )
 
 const API_VERSION = "v1"
@@ -30,11 +30,11 @@ const PATH_DELETE = "/delete"
 const GIST_PROFILE_BASE_PATH = "https://gist.github.com/"
 
 type accessTokenResponse struct {
-	AccessToken      string `json:"access_token"`
+	AccessToken string `json:"access_token"`
 }
 
 type DashboardRequest struct {
-	Code string `json:"code"`
+	Code        string `json:"code"`
 	AccessToken string `json:"access_token"`
 }
 
@@ -67,7 +67,7 @@ type DashboardData struct {
 						URL         string    `json:"url"`
 						UpdatedAt   time.Time `json:"updatedAt"`
 						Name        string    `json:"name"`
-						IsPublic    bool    `json:"isPublic"`
+						IsPublic    bool      `json:"isPublic"`
 					} `json:"node"`
 				} `json:"edges"`
 			} `json:"gists"`
@@ -124,6 +124,37 @@ func handleDelete(responseWriter http.ResponseWriter, request *http.Request) {
 	writeResponseObject(responseWriter, map[string]interface{}{})
 }
 
+func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) {
+	var dashboardRequest DashboardRequest
+	decodeJson(&dashboardRequest, request.Body)
+
+	accessToken := dashboardRequest.AccessToken
+
+	if accessToken == "" {
+		accessToken = getAccessTokenFromCode(dashboardRequest.Code)
+	}
+
+	apiRequest := createGraphQlRequest(os.Getenv("GITHUB_GRAPHQL_API"), DASHBOARD_DATA_QUERY, accessToken)
+	apiResponse := doHttpRequest(apiRequest)
+
+	var apiResponseData DashboardData
+	decodeJson(&apiResponseData, apiResponse.Body)
+
+	dashboardDataObject := map[string]interface{}{
+		"access_token":  accessToken,
+		"is_successful": apiResponseData.Data.Viewer.Id != "",
+		"id":            apiResponseData.Data.Viewer.Id,
+		"username":      apiResponseData.Data.Viewer.Login,
+		"avatar_url":    apiResponseData.Data.Viewer.AvatarURL,
+		"name":          apiResponseData.Data.Viewer.Name,
+		"bio":           apiResponseData.Data.Viewer.Bio,
+		"url":           GIST_PROFILE_BASE_PATH + apiResponseData.Data.Viewer.Login,
+		"gists":         getGistsFromEdges(apiResponseData),
+	}
+
+	writeResponseObject(responseWriter, dashboardDataObject)
+}
+
 func doHttpRequest(request *http.Request) *http.Response {
 	client := &http.Client{}
 
@@ -161,37 +192,6 @@ func createPusherClient() pusher.Client {
 		Cluster: os.Getenv("PUSHER_CLUSTER"),
 		Secure:  true,
 	}
-}
-
-func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) {
-	var dashboardRequest DashboardRequest
-	decodeJson(&dashboardRequest, request.Body)
-
-	accessToken := dashboardRequest.AccessToken
-
-	if accessToken == ""  {
-		accessToken = getAccessTokenFromCode(dashboardRequest.Code)
-	}
-
-	apiRequest := createGraphQlRequest(os.Getenv("GITHUB_GRAPHQL_API"), DASHBOARD_DATA_QUERY, accessToken)
-	apiResponse := doHttpRequest(apiRequest)
-
-	var apiResponseData DashboardData
-	decodeJson(&apiResponseData, apiResponse.Body)
-
-	dashboardDataObject := map[string]interface{}{
-		"access_token":  accessToken,
-		"is_successful": apiResponseData.Data.Viewer.Id != "",
-		"id":            apiResponseData.Data.Viewer.Id,
-		"username":      apiResponseData.Data.Viewer.Login,
-		"avatar_url":    apiResponseData.Data.Viewer.AvatarURL,
-		"name":          apiResponseData.Data.Viewer.Name,
-		"bio":           apiResponseData.Data.Viewer.Bio,
-		"url":           GIST_PROFILE_BASE_PATH + apiResponseData.Data.Viewer.Login,
-		"gists":         getGistsFromEdges(apiResponseData),
-	}
-
-	writeResponseObject(responseWriter, dashboardDataObject)
 }
 
 func getAccessTokenFromCode(accessCode string) string {
@@ -296,7 +296,7 @@ func writeResponseObject(responseWriter http.ResponseWriter, responseObject map[
 	}
 }
 
-func logError(err error, parameters ...interface{}){
+func logError(err error, parameters ...interface{}) {
 	sentry.CaptureException(err)
 	sentry.Flush(time.Second * 5)
 
@@ -316,7 +316,7 @@ func init() {
 func Handler(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.URL.Path == PATH_DASHBOARD && request.Method == http.MethodPost {
 		handleDashboard(responseWriter, request)
-	} else if  request.URL.Path == PATH_DELETE && request.Method == http.MethodDelete {
+	} else if request.URL.Path == PATH_DELETE && request.Method == http.MethodDelete {
 		handleDelete(responseWriter, request)
 	} else {
 		handleCatchAll(responseWriter, request)

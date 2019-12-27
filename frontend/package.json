@@ -17,7 +17,7 @@
   "scripts": {
     "start": "npm-run-all --parallel watch:css start:react",
     "build": "npm-run-all build:css build:react",
-    "build:css": "postcss src/styles/tailwind.pcss -o src/styles/tailwind.css",
+    "build:css": "NODE_ENV=production postcss src/styles/tailwind.pcss -o src/styles/tailwind.css",
     "watch:css": "postcss src/styles/tailwind.pcss -o src/styles/tailwind.css -w",
     "start:react": "react-scripts start",
     "build:react": "react-scripts build",

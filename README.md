@@ -4,6 +4,8 @@ This is a web app to help you delete multiple gists on github at once. **Why?** 
 
 if you have any suggestions/questions, open a PR or issue on github. If you're not inclined to make PRs you can tweet me at [@acho_arnold](https://twitter.com/acho_arnold)!
 
+![](./frontend/public/workflow.gif)
+
 ## Directory Structure
 
 This web app follows the subscribe to the [monolithic repo philosophy](https://danluu.com/monorepo/). So there’s one and only one repo, containing deploy scripts, frontend & backend code. The frontend code is inside the [./frontend](./frontend) directory and the backend code is inside the [./backend](./backend) directory. There's some github-actions configuration to easily deploy to firebase when a push is one to the master branch. The code for this is found inside the [./.github/workflows](./.github/workflows) directory

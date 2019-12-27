@@ -327,7 +327,7 @@ class Dashboard extends Component {
                     onClick={this.openDisplayModal}
                     className={`${BASE_BUTTON_CLASS} ${
                       this.hasCheckedGists()
-                        ? ''
+                        ? 'hover:bg-red-500 hover:text-white'
                         : 'opacity-50 cursor-not-allowed'
                     }`}
                   >
@@ -440,7 +440,7 @@ class Dashboard extends Component {
                     disabled={!this.usernameInputIsEqualToUsername()}
                     className={`${BASE_BUTTON_CLASS} ${
                       this.usernameInputIsEqualToUsername()
-                        ? ''
+                        ? 'hover:bg-red-500 hover:text-white'
                         : 'opacity-50 cursor-not-allowed'
                     }`}
                   >
