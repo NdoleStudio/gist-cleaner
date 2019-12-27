@@ -19,7 +19,12 @@ const LandingPage = () =>
         </div>
       </div>
     </div>
-    <div className="md:w-2/3 bg-green-700">
+    <div className="md:w-2/3 bg-green-700 flex items-center">
+      <div className="-mt-4 -mt-4">
+        <h2 className="text-center font-bold text-white text-2xl mb-4">It's as simple as this</h2>
+        <img src="/header-image.jpg" alt="Header Image" width="90%" className="mx-auto"/>
+      </div>
+
     </div>
   </div>;
 
