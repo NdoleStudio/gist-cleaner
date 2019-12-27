@@ -170,6 +170,8 @@ class Dashboard extends Component {
 
     this.closeDisplayModal(event);
 
+    this.removeDeletedGistsFromState();
+
     toast.info(() => (
       <p>
         Your gists are now being deleted.
@@ -177,8 +179,6 @@ class Dashboard extends Component {
         You'll get a notification when it's done!
       </p>
     ));
-
-    this.removeDeletedGistsFromState();
 
     fetch(API_ENDPOINT_DELETE, {
       method: 'DELETE',
