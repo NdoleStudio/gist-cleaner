@@ -7,7 +7,6 @@ import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 import LandingPage from "./pages/LandingPage";
 import Notfound from "./pages/404";
 
-
 const routing = (
   <Router>
     <div>
