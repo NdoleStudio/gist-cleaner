@@ -289,12 +289,12 @@ class Dashboard extends Component {
         <header className="flex justify-center bg-black text-white p-2 header">
           <a href={ROUTE_LANDING_PAGE} className="flex align-middle">
             <img src={logo} alt="Gist Cleaner logo" className="page-logo" />
-            <h2 className="text-3xl font-bold ml-3">GitHub Gist Cleaner</h2>
+            <h2 className="md:text-3xl text-xl font-bold ml-3">GitHub Gist Cleaner</h2>
           </a>
         </header>
         {this.state.isLoaded ? (
           <section className="body-content flex md:max-w-5xl mx-auto">
-            <div className="md:w-1/4 pt-6 px-3">
+            <div className="md:w-1/4 hidden md:block pt-6 px-3">
               <a
                 href={this.state.url}
                 target="_blank"
@@ -312,9 +312,9 @@ class Dashboard extends Component {
                 <p className="text-gray-900 text-sm mt-1">{this.state.bio}</p>
               </div>
             </div>
-            <div className="md:w-3/4 pt-6 px-3">
+            <div className="md:w-3/4 w-full pt-6 px-3">
               <div className="w-full flex items-center">
-                <div className="w-4/12 pl-4">
+                <div className="md:w-4/12 w-5/12 pl-4">
                   <CheckBox
                     isChecked={this.selectAllIsChecked()}
                     onChange={() => this.toggleSelectAllCheckbox()}
@@ -346,7 +346,7 @@ class Dashboard extends Component {
                 this.state.gists.map(gist => {
                   return (
                     <div className="w-full flex mb-3" key={gist.id}>
-                      <div className="w-1/12 pl-4">
+                      <div className="w-2/12 md:w-1/12  pl-4">
                         <CheckBox
                           isChecked={this.state.checkedGists.includes(
                             gist.name
@@ -354,7 +354,7 @@ class Dashboard extends Component {
                           onChange={() => this.toggleCheckBox(gist.name)}
                         />
                       </div>
-                      <div className="w-11/12 header">
+                      <div className="w-10/12 md:w-11/12 header">
                         <div className="w-full flex bg-gray-300 rounded text-black px-3 border-2 rounded-b-none border-gray-400">
                           <div className="w-11/12">
                             <h2 className="font-bold">{gist.file_name}</h2>

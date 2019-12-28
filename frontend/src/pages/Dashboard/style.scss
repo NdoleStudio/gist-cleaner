@@ -105,6 +105,15 @@
   }
 }
 
+/* Modal Content */
+@media (max-width: 600px) {
+  .modal {
+    .modal-content {
+      width: 90%;
+    }
+  }
+}
+
 /* Loading Animation */
 .animation-container{
   height: calc(100vh - 61px);

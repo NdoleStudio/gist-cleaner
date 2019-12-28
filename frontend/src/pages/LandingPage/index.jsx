@@ -5,9 +5,9 @@ import {GITHUB_AUTH_URL} from "../../constants/constants";
 import logo from '../../images/github-logo.png';
 
 const LandingPage = () =>
-  <div className="app w-full h-screen flex">
-    <div className="md:w-1/3 flex items-center">
-      <div className="px-2">
+  <div className="app w-full h-screen md:flex">
+    <div className="md:w-1/3 w-full md:flex pt-16 mb-4 items-center">
+      <div className="px-2 w-full">
         <h2 className="w-full text-center text-3xl">
           This app helps you delete multiple github gists at once
         </h2>
@@ -19,12 +19,12 @@ const LandingPage = () =>
         </div>
       </div>
     </div>
-    <div className="md:w-2/3 bg-green-700 flex items-center">
+    <div className="md:w-2/3 w-full  py-8 bg-green-700 flex items-center">
       <div className="-mt-4 -mt-4">
         <h2 className="text-center font-bold text-white text-2xl mb-4">It is as simple as this</h2>
-        <video width="90%" className="mx-auto" autoPlay loop>
+        <video width="90%" className="mx-auto workflow-video" autoPlay loop>
           <source src="/workflow.mp4" type="video/mp4" />
-          <img src="/header-image.jpg" alt="Header" width="90%" className="mx-auto"/>
+          <img src="/header-image.jpg" alt="Header"/>
         </video>
       </div>
 
