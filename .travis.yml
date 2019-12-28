@@ -1,0 +1,12 @@
+language: node_js
+
+cache:
+  yarn: true
+
+before_script:
+  - cd frontend
+
+script: 
+  - yarn install
+  - yarn test
+
