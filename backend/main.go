@@ -300,7 +300,7 @@ func logError(err error, parameters ...interface{}) {
 	sentry.CaptureException(err)
 	sentry.Flush(time.Second * 5)
 
-	log.Panicln(err.Error(), parameters)
+	log.Println(err.Error(), parameters)
 }
 
 func init() {
