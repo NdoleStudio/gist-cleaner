@@ -3,8 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/getsentry/sentry-go"
-	"github.com/pusher/pusher-http-go"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,46 +11,61 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/getsentry/sentry-go"
+	"github.com/pusher/pusher-http-go"
 )
 
-const API_VERSION = "v1"
 
-const JSON_CONTENT_TYPE = "application/json"
+// APIVersion represents the version of the API
+const APIVersion = "v1"
 
-const DASHBOARD_DATA_QUERY = "{\"query\": \"query {viewer{login id bio avatarUrl url name gists(first:50,privacy:ALL,orderBy:{field:CREATED_AT,direction:DESC}){edges{node{id files{name} description url updatedAt name isPublic}}}}}\"}"
+// JSONContentType string value for the json content type
+const JSONContentType = "application/json"
 
-const EVENT_GIST_DELETED = "gist-deleted"
-const EVENT_ALL_GISTS_DELETED = "all-gists-deleted"
+// DashboardDataQuery GraphQl query to provide the dashboard data
+const DashboardDataQuery = "{\"query\": \"query {viewer{login id bio avatarUrl url name gists(first:50,privacy:ALL,orderBy:{field:CREATED_AT,direction:DESC}){edges{node{id files{name} description url updatedAt name isPublic}}}}}\"}"
 
-const PATH_DASHBOARD = "/dashboard"
-const PATH_DELETE = "/delete"
+// EventGistDeleted event raised when a gist is deleted
+const EventGistDeleted = "gist-deleted"
 
-const GIST_PROFILE_BASE_PATH = "https://gist.github.com/"
+// EventAllGistsDeleted event raised when all gists have been deleted
+const EventAllGistsDeleted = "all-gists-deleted"
+
+// PathDashboard path to the dashboard api resource
+const PathDashboard = "/dashboard"
+
+// PathDelete path to the delete resource
+const PathDelete = "/delete"
+
+// GistProfileBasePath path to the github gist
+const GistProfileBasePath = "https://gist.github.com/"
+
 
 type accessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-type DashboardRequest struct {
+type dashboardRequest struct {
 	Code        string `json:"code"`
 	AccessToken string `json:"access_token"`
 }
 
-type DeleteRequest struct {
+type deleteRequest struct {
 	AccessToken string `json:"access_token"`
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Gists       []struct {
 		ID       string `json:"id"`
 		FileName string `json:"file_name"`
 	} `json:"gists"`
 }
 
-type DashboardData struct {
+type dashboardData struct {
 	Data struct {
 		Viewer struct {
 			Login     string `json:"login"`
 			Bio       string `json:"bio"`
-			Id        string `json:"id"`
+			ID        string `json:"id"`
 			AvatarURL string `json:"avatarUrl"`
 			URL       string `json:"url"`
 			Name      string `json:"name"`
@@ -75,11 +88,11 @@ type DashboardData struct {
 	} `json:"data"`
 }
 
-type HashMap map[string]interface{}
+type hashMap map[string]interface{}
 
 func handleCatchAll(responseWriter http.ResponseWriter, request *http.Request) {
 	responseObject := map[string]interface{}{
-		"apiVersion": API_VERSION,
+		"apiVersion": APIVersion,
 		"url":        request.URL.String(),
 	}
 
@@ -87,8 +100,8 @@ func handleCatchAll(responseWriter http.ResponseWriter, request *http.Request) {
 }
 
 func handleDelete(responseWriter http.ResponseWriter, request *http.Request) {
-	var deleteRequest DeleteRequest
-	decodeJson(&deleteRequest, request.Body)
+	var deleteRequest deleteRequest
+	decodeJSON(&deleteRequest, request.Body)
 
 	pusherClient := createPusherClient()
 
@@ -98,15 +111,15 @@ func handleDelete(responseWriter http.ResponseWriter, request *http.Request) {
 		go func(index int) {
 			gist := deleteRequest.Gists[index]
 
-			deleteUrl := os.Getenv("GITHUB_REST_API_ENDPOINT") + "/gists/" + gist.ID
-			apiRequest := createDeleteRequest(deleteUrl, deleteRequest.AccessToken)
-			apiResponse := doHttpRequest(apiRequest)
+			deleteURL := os.Getenv("GITHUB_REST_API_ENDPOINT") + "/gists/" + gist.ID
+			apiRequest := createDeleteRequest(deleteURL, deleteRequest.AccessToken)
+			apiResponse := doHTTPRequest(apiRequest)
 
 			if apiResponse.StatusCode == http.StatusNoContent {
 				sendPusherTrigger(
 					pusherClient,
-					deleteRequest.Id,
-					EVENT_GIST_DELETED,
+					deleteRequest.ID,
+					EventGistDeleted,
 					map[string]string{
 						"file_name": gist.FileName,
 					},
@@ -119,14 +132,14 @@ func handleDelete(responseWriter http.ResponseWriter, request *http.Request) {
 
 	waitGroup.Wait()
 
-	sendPusherTrigger(pusherClient, deleteRequest.Id, EVENT_ALL_GISTS_DELETED, nil)
+	sendPusherTrigger(pusherClient, deleteRequest.ID, EventAllGistsDeleted, nil)
 
 	writeResponseObject(responseWriter, map[string]interface{}{})
 }
 
 func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) {
-	var dashboardRequest DashboardRequest
-	decodeJson(&dashboardRequest, request.Body)
+	var dashboardRequest dashboardRequest
+	decodeJSON(&dashboardRequest, request.Body)
 
 	accessToken := dashboardRequest.AccessToken
 
@@ -134,28 +147,28 @@ func handleDashboard(responseWriter http.ResponseWriter, request *http.Request) 
 		accessToken = getAccessTokenFromCode(dashboardRequest.Code)
 	}
 
-	apiRequest := createGraphQlRequest(os.Getenv("GITHUB_GRAPHQL_API"), DASHBOARD_DATA_QUERY, accessToken)
-	apiResponse := doHttpRequest(apiRequest)
+	apiRequest := createGraphQlRequest(os.Getenv("GITHUB_GRAPHQL_API"), DashboardDataQuery, accessToken)
+	apiResponse := doHTTPRequest(apiRequest)
 
-	var apiResponseData DashboardData
-	decodeJson(&apiResponseData, apiResponse.Body)
+	var apiResponseData dashboardData
+	decodeJSON(&apiResponseData, apiResponse.Body)
 
 	dashboardDataObject := map[string]interface{}{
 		"access_token":  accessToken,
-		"is_successful": apiResponseData.Data.Viewer.Id != "",
-		"id":            apiResponseData.Data.Viewer.Id,
+		"is_successful": apiResponseData.Data.Viewer.ID != "",
+		"id":            apiResponseData.Data.Viewer.ID,
 		"username":      apiResponseData.Data.Viewer.Login,
 		"avatar_url":    apiResponseData.Data.Viewer.AvatarURL,
 		"name":          apiResponseData.Data.Viewer.Name,
 		"bio":           apiResponseData.Data.Viewer.Bio,
-		"url":           GIST_PROFILE_BASE_PATH + apiResponseData.Data.Viewer.Login,
+		"url":           GistProfileBasePath + apiResponseData.Data.Viewer.Login,
 		"gists":         getGistsFromEdges(apiResponseData),
 	}
 
 	writeResponseObject(responseWriter, dashboardDataObject)
 }
 
-func doHttpRequest(request *http.Request) *http.Response {
+func doHTTPRequest(request *http.Request) *http.Response {
 	client := &http.Client{}
 
 	apiResponse, err := client.Do(request)
@@ -166,7 +179,7 @@ func doHttpRequest(request *http.Request) *http.Response {
 	return apiResponse
 }
 
-func decodeJson(variable interface{}, reader io.Reader) interface{} {
+func decodeJSON(variable interface{}, reader io.Reader) interface{} {
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(variable)
 	if err != nil {
@@ -202,16 +215,16 @@ func getAccessTokenFromCode(accessCode string) string {
 	}
 
 	apiRequest := createPostRequest(os.Getenv("GITHUB_ACCESS_TOKEN_ENDPOINT"), requestParams)
-	apiResponse := doHttpRequest(apiRequest)
+	apiResponse := doHTTPRequest(apiRequest)
 
-	var githubApiResponse accessTokenResponse
-	decodeJson(&githubApiResponse, apiResponse.Body)
+	var githubAPIResponse accessTokenResponse
+	decodeJSON(&githubAPIResponse, apiResponse.Body)
 
-	return githubApiResponse.AccessToken
+	return githubAPIResponse.AccessToken
 }
 
-func getGistsFromEdges(apiResponseData DashboardData) []HashMap {
-	gists := make([]HashMap, 0)
+func getGistsFromEdges(apiResponseData dashboardData) []hashMap {
+	gists := make([]hashMap, 0)
 	gistData := apiResponseData.Data.Viewer.Gists.Edges
 
 	for index := range gistData {
@@ -236,8 +249,8 @@ func createDeleteRequest(url string, token string) *http.Request {
 		logError(err, "Cannot create request", url)
 	}
 
-	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
-	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
+	apiRequest.Header.Set("Accept", JSONContentType)
+	apiRequest.Header.Set("Content-Type", JSONContentType)
 	apiRequest.Header.Set("Authorization", "token "+token)
 
 	return apiRequest
@@ -249,8 +262,8 @@ func createPostRequest(url string, requestParams map[string]interface{}) *http.R
 		logError(err, "Cannot create request", url)
 	}
 
-	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
-	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
+	apiRequest.Header.Set("Accept", JSONContentType)
+	apiRequest.Header.Set("Content-Type", JSONContentType)
 
 	return apiRequest
 }
@@ -262,8 +275,8 @@ func createGraphQlRequest(url string, query string, token string) *http.Request 
 	}
 
 	apiRequest.Header.Set("Authorization", "bearer "+token)
-	apiRequest.Header.Set("Accept", JSON_CONTENT_TYPE)
-	apiRequest.Header.Set("Content-Type", JSON_CONTENT_TYPE)
+	apiRequest.Header.Set("Accept", JSONContentType)
+	apiRequest.Header.Set("Content-Type", JSONContentType)
 
 	return apiRequest
 }
@@ -278,7 +291,7 @@ func jsonEncodeMap(mapObject map[string]interface{}) []byte {
 }
 
 func writeResponseObject(responseWriter http.ResponseWriter, responseObject map[string]interface{}) {
-	responseWriter.Header().Set("Content-Type", JSON_CONTENT_TYPE)
+	responseWriter.Header().Set("Content-Type", JSONContentType)
 	responseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 	responseWriter.Header().Set("Access-Control-Allow-Methods", "POST, DELETE")
 	responseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -313,10 +326,11 @@ func init() {
 	}
 }
 
+// Handler This is the entry function for all requests. It's responsible for the routing.
 func Handler(responseWriter http.ResponseWriter, request *http.Request) {
-	if request.URL.Path == PATH_DASHBOARD && request.Method == http.MethodPost {
+	if request.URL.Path == PathDashboard && request.Method == http.MethodPost {
 		handleDashboard(responseWriter, request)
-	} else if request.URL.Path == PATH_DELETE && request.Method == http.MethodDelete {
+	} else if request.URL.Path == PathDelete && request.Method == http.MethodDelete {
 		handleDelete(responseWriter, request)
 	} else {
 		handleCatchAll(responseWriter, request)
