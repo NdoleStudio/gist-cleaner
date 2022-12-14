@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://gist-cleaner.ndolestudio.com",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "moment": "^2.27.0",
     "momentjs": "^2.0.0",
     "pusher-js": "^5.1.1",
