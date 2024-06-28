@@ -21,7 +21,7 @@ import {
 import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
 import moment from 'moment';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import Pusher from 'pusher-js';
 
@@ -232,7 +232,7 @@ class Dashboard extends Component {
       ));
     });
 
-    channel.bind(EVENT_ALL_GISTS_DELETED, data => {
+    channel.bind(EVENT_ALL_GISTS_DELETED, _ => {
       toast.success(() => <p>All the gists have been deleted successfully!</p>);
       pusher.disconnect();
     });
@@ -282,6 +282,7 @@ class Dashboard extends Component {
   render() {
     return (
       <div className="bg-gray-100">
+        <ToastContainer />
         <header className="flex justify-center bg-black text-white p-2 header">
           <a href={ROUTE_LANDING_PAGE} className="flex align-middle">
             <img src={logo} alt="Gist Cleaner logo" className="page-logo" />
