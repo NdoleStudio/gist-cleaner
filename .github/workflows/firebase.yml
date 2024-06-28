@@ -45,7 +45,7 @@ jobs:
           path: ./web/build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_GIST_CLEANER }}"
           projectId: ${{ secrets.PROJECT_ID }}
           entryPoint: "./web"
           channelId: live
