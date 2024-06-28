@@ -11,17 +11,25 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
       - name: Install Dependencies
-        run: yarn install
-        working-directory: ./frontend
+        run: pnpm install
+        working-directory: ./web
       - name: Build
         run: yarn build
-        working-directory: ./frontend
+        working-directory: ./web
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
           name: build
-          path: ./frontend/build
+          path: ./web/build
   deploy:
     name: Deploy
     needs: build
@@ -33,12 +41,12 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: build
-          path: ./frontend/build
+          path: ./web/build
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_PATH: ./frontend
+          PROJECT_PATH: ./web
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
