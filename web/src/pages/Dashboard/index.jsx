@@ -47,10 +47,6 @@ class Dashboard extends Component {
     this.closeDisplayModal = this.closeDisplayModal.bind(this);
     this.handleUsernameInputChange = this.handleUsernameInputChange.bind(this);
     this.deleteButtonClicked = this.deleteButtonClicked.bind(this);
-
-    toast.configure({
-      autoClose: 8000,
-    });
   }
 
   componentDidMount() {
