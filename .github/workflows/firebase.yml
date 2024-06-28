@@ -43,11 +43,9 @@ jobs:
         with:
           name: build
           path: ./web/build
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          args: deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_PATH: ./web
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: ${{ secrets.PROJECT_ID }}
+          entryPoint: "./web"
+          channelId: live
