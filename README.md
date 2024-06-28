@@ -1,6 +1,9 @@
 # Gist Cleaner
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/NdoleStudio/gist-cleaner)](https://goreportcard.com/report/github.com/NdoleStudio/gist-cleaner) [![Build Status](https://travis-ci.com/NdoleStudio/gist-cleaner.svg?branch=master)](https://travis-ci.com/NdoleStudio/gist-cleaner) 
+[![Build](https://github.com/NdoleStudio/gist-cleaner/actions/workflows/firebase.yml/badge.svg)](https://github.com/NdoleStudio/gist-cleaner/actions/workflows/firebase.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/NdoleStudio/gist-cleaner)](https://goreportcard.com/report/github.com/NdoleStudio/gist-cleaner)
+![Vercel](https://vercelbadge.vercel.app/api/NdoleStudio/gist-cleaner)
+
 
 This is a web app to help you delete multiple gists on github at once. **Why?** Currently github doesn't provide this functionality for you to delete multiple gists at once.
 
