@@ -3,7 +3,7 @@
   "name": "api.gist-cleaner.ndolestudio.com",
   "public": true,
   "builds": [
-  	{ "src": "backend/**/*.go", "use": "@now/go" }
+  	{ "src": "backend/**/*.go", "use": "@vercel/go" }
   ],
   "rewrites": [
     { "source": "(.*)", "destination": "backend/main.go" }
