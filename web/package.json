@@ -17,7 +17,7 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
     "sass": "^1.77.8",
-    "tailwindcss": "^3.4.7",
+    "tailwindcss": "^3.4.10",
     "web-vitals": "^4.2.2"
   },
   "scripts": {
