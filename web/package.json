@@ -13,7 +13,7 @@
     "pusher-js": "8.4.0-rc2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
+    "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
     "sass": "^1.79.4",
