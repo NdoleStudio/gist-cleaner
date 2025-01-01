@@ -3,7 +3,7 @@ module github.com/NdoleStudio/gist-cleaner/tree/master/backend
 go 1.22
 
 require (
-	github.com/getsentry/sentry-go v0.29.1
+	github.com/getsentry/sentry-go v0.30.0
 	github.com/pusher/pusher-http-go v4.0.1+incompatible
 )
 
