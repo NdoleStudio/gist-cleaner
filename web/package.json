@@ -16,7 +16,7 @@
     "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.3",
-    "sass": "^1.83.4",
+    "sass": "^1.85.1",
     "tailwindcss": "^4.0.2",
     "web-vitals": "^4.2.4"
   },
