@@ -4,7 +4,7 @@ go 1.22
 toolchain go1.24.1
 
 require (
-	github.com/getsentry/sentry-go v0.31.1
+	github.com/getsentry/sentry-go v0.32.0
 	github.com/pusher/pusher-http-go v4.0.1+incompatible
 )
 
