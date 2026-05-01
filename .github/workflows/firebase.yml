@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
           version: 9
