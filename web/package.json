@@ -5,7 +5,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.1",
     "moment": "^2.31.0",
     "postscribe": "^2.0.8",
