@@ -22,7 +22,7 @@ import CheckBox from '../../components/CheckBox';
 import postscribe from 'postscribe';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import Pusher from 'pusher-js';
 
 class Dashboard extends Component {
