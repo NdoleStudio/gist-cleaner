@@ -6,7 +6,7 @@
     "@mdi/font": "^7.4.47",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/user-event": "^14.6.8",
     "moment": "^2.31.0",
     "postscribe": "^2.0.8",
     "pretty-checkbox": "^3.0.3",
